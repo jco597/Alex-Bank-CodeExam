@@ -11,6 +11,10 @@ namespace AlexBankExam.API.Controllers
     [ApiController]
     public class TransactionsController : ControllerBase
     {
-        
+        [HttpGet]
+        public IEnumerable<string> GetAccounts()
+        {
+            return new string[] { "value1", "value2" };
+        }
     }
 }
