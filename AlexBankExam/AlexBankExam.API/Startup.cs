@@ -26,7 +26,7 @@ namespace AlexBankExam.API
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "AlexBankExam.API", Version = "v1" });
             });
             services.AddDbContext<DataContext>(option => { 
-                option.UseSqlite(_config.GetConnectionString("DefaultDbConnection")); 
+                option.UseSqlServer(_config.GetConnectionString("DefaultDbConnection")); 
             });
         }
 

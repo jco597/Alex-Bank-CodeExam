@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AlexBankExam.Persistence.Domain
-{    
+{
     public class Transaction
     {
         [Key]
@@ -21,17 +18,15 @@ namespace AlexBankExam.Persistence.Domain
         [StringLength(20)]
         public string ToAccount { get; set; }
 
-        [StringLength(500)]
+        [StringLength(250)]
         public string Description { get; set; }
 
         [Required]
         public decimal Amount { get; set; }
 
         [Required]
-        public DateTime TransactionDate { get; set; }
+        public DateTime? TransactionDate { get; set; }
 
-        [Required]
         public Customer Owner { get; set; }
-
     }
 }
