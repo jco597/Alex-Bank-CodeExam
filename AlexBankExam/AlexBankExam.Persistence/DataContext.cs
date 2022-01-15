@@ -8,6 +8,7 @@ namespace AlexBankExam.Persistence
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {            
+            
         }
 
         public DbSet<Transaction> Transactions { get; set; }
@@ -20,17 +21,19 @@ namespace AlexBankExam.Persistence
 
             modelBuilder.Entity<Transaction>(entity => {
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.FromAccount).IsRequired(true);
-                entity.Property(e => e.ToAccount).IsRequired(true);
-                entity.Property(e => e.Amount).IsRequired(true);
-                entity.Property(e => e.Description).IsUnicode(false);
-                entity.Property(e => e.Owner).IsRequired(true).IsUnicode(false);
-                entity.Property(e => e.TransactionDate).IsRequired(false);
+                entity.Property(e => e.Id).HasColumnType<Guid>("TEXT");
+                entity.Property(e => e.FromAccount).HasColumnType<string>("TEXT");
+                entity.Property(e => e.ToAccount).HasColumnType<string>("TEXT");
+                entity.Property(e => e.Amount).HasColumnType<decimal>("NUMERIC");
+                entity.Property(e => e.Description).HasColumnType<string>("TEXT");
+                entity.Property(e => e.Owner);
+                entity.Property(e => e.TransactionDate).HasColumnType<DateTime>("TEXT");
             });
 
             modelBuilder.Entity<Customer>(entity => {
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Name).IsRequired(true);
+                entity.Property(e => e.Id).HasColumnType<Guid>("TEXT");
+                entity.Property(e => e.Name).HasColumnType<string>("TEXT");
             });
          }
 

@@ -14,7 +14,7 @@ namespace AlexBankExam.Persistence.Domain
         public Guid Id { get; set; }
 
         [Required]
-        [StringLength(250)]
+        [StringLength(150)]
         public string Name { get; set; }
     }
 }
