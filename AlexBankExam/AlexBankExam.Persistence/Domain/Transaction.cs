@@ -27,6 +27,7 @@ namespace AlexBankExam.Persistence.Domain
         [Required]
         public DateTime? TransactionDate { get; set; }
 
+        [NotMapped]
         public Customer Owner { get; set; }
     }
 }

@@ -5,7 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using AlexBankExam.Persistence;
+using AlexBankExam.API.Services;
 
 namespace AlexBankExam.API
 {
@@ -25,9 +28,16 @@ namespace AlexBankExam.API
             services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "AlexBankExam.API", Version = "v1" });
             });
-            services.AddDbContext<DataContext>(option => { 
-                option.UseSqlServer(_config.GetConnectionString("DefaultDbConnection")); 
-            });
+
+            services.AddDbContext<DataContext>(option => { option.UseSqlServer(_config.GetConnectionString("DefaultDbConnection")); });
+
+            services.AddScoped<IDataAccessService, DataAccessService>();
+
+            services.ConfigureAuthenticationJwtBearer(_config);
+
+            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => _config.Bind("JwtSettings", options))
+            //    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => _config.Bind("CookieSettings", options));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,6 +53,7 @@ namespace AlexBankExam.API
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => {

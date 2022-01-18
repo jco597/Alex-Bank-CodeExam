@@ -17,7 +17,7 @@ namespace AlexBankExam.Persistence.Domain
         [StringLength(150)]
         public string Name { get; set; }
 
-        [Required]
+        [NotMapped]
         public ICollection<Transaction> Transactions { get; set; }
     }
 }

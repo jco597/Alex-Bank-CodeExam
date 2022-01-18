@@ -7,12 +7,11 @@ namespace AlexBankExam.Persistence
     public class DataContext : DbContext
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
-        {                 
-            
+        {                             
         }
 
-        public DbSet<Transaction> Transactions { get; set; }
-        public DbSet<Customer> Customers { get; set; }
+        public virtual DbSet<Transaction> Transactions { get; set; }
+        public virtual DbSet<Customer> Customers { get; set; }
  
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
