@@ -14,6 +14,21 @@ namespace AlexBankExam.API.Services
 {
     public static class ControllerServiceExtension
     {
+        public static void ConfigureCors(this IServiceCollection services, IConfiguration config)
+        {
+            const string CORS_POLICY_NAME = "ApiCORSPolicy";
+            //const string CORS_ORIGINS = "CorsOrigins";
+
+            services.AddCors(options => {
+                options.AddPolicy(name: CORS_POLICY_NAME, builder => {
+                    builder.AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .SetIsOriginAllowed(origin => true);
+                });
+            });
+        }
+
         public static void ConfigureAuthenticationJwtBearer(this IServiceCollection services, IConfiguration Configuration)
         {
             var secret = "secreyKey123456";
@@ -48,33 +63,6 @@ namespace AlexBankExam.API.Services
             })
             .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => 
                 Configuration.Bind("CookieSettings", options));
-
-            //.AddMicrosoftIdentityWebApi(Configuration, AZURE_AD);
-
-
-            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddMicrosoftIdentityWebApi(Configuration, AZURE_AD, "Bearer");
-
-
-            //services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options => {
-            //    //options.Events = new JwtBearerEvents 
-            //    //{
-            //    //    OnAuthenticationFailed = context => 
-            //    //    {
-            //    //        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-            //    //            context.Response.Headers.Add("Token-Expired", "true");
-            //    //        return Task.CompletedTask;
-            //    //    };
-            //    //}
-
-            //    var existingOnTokenValidatedHandler = options.Events.OnTokenValidated;
-            //    options.Events.OnTokenValidated = async context => {
-            //        await existingOnTokenValidatedHandler(context);
-            //        // Your code to add extra configuration that will be executed after the current event implementation.
-            //        options.TokenValidationParameters.ValidIssuers = new[] { /* list of valid issuers */ };
-            //        options.TokenValidationParameters.ValidAudiences = new[] { /* list of valid audiences */};
-            //    }
-            //});
         }
     }
 }

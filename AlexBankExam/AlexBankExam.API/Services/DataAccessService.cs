@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using AlexBankExam.Persistence;
 using AlexBankExam.Persistence.Domain;
+using MediatR;
 
 namespace AlexBankExam.API.Services
-{   
+{
     public class DataAccessService : IDataAccessService
-    {        
+    {
         private readonly DataContext _context;
         private readonly ILogger<DataAccessService> _logger;
 
@@ -22,7 +24,8 @@ namespace AlexBankExam.API.Services
 
         public async Task<IEnumerable<Transaction>> GetTransactionsAsync()
         {
-            try {                
+
+            try {
                 var data = await _context.Transactions.ToListAsync();
                 if (data == null)
                     return null;
@@ -32,7 +35,7 @@ namespace AlexBankExam.API.Services
                 _logger.LogError($"DataAccessService::GetTransactions::Message = {ex.Message}");
                 throw new Exception(ex.Message, ex);
             }
-            finally {                
+            finally {
                 await _context.DisposeAsync();
             }
         }
@@ -40,7 +43,7 @@ namespace AlexBankExam.API.Services
         public async Task<Transaction> CreateTransactionAsync(Transaction txn)
         {
             _context.Database.BeginTransaction();
-            var result = await _context.Transactions.AddAsync(txn);
+            var result = _context.Transactions.Add(txn);
 
             try {
                 await _context.SaveChangesAsync();
@@ -67,7 +70,7 @@ namespace AlexBankExam.API.Services
                 await _context.SaveChangesAsync();
                 return result.Entity;
             }
-            catch(DbUpdateException e) {
+            catch (DbUpdateException e) {
                 _logger.LogError(e.Message, e);
                 throw e.InnerException;
             }

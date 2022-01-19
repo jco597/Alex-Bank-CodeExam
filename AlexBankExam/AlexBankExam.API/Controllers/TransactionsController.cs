@@ -4,76 +4,64 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authorization;
+using MediatR;
 using AlexBankExam.Persistence;
 using AlexBankExam.Persistence.Domain;
 using AlexBankExam.API.Services;
+using AlexBankExam.API.Services.DataTxn;
 
 namespace AlexBankExam.API.Controllers
 {
     public class TransactionsController : BaseApiController
-    {       
+    {
         private readonly ILogger<DataAccessService> _logger;
-        private readonly DataContext _context;
-        private readonly DataAccessService _service;
 
-        public TransactionsController(ILogger<DataAccessService> logger, DataContext context)
+        public TransactionsController(ILogger<DataAccessService> logger, IMediator mediator)
         {
             _logger = logger;
-            _context = context;
-            _service = new DataAccessService(_logger, _context);
         }
 
-        //[Authorize]
+        //[Authorize]        
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Transaction>> GetBankTransaction(Guid id) => await Mediator.Send(new DataFind.Query { Id = id });
+
         [HttpGet]
-        public async Task<IActionResult> GetBankTransactions()
-        {
-            var result = await _service.GetTransactionsAsync();
+        public async Task<ActionResult<List<Transaction>>> GetBankTransactionList() => await Mediator.Send(new DataList.Query());
 
-            if (result == null)
-                return NotFound("Error in fetching Datasets.");
-            
-            return Ok(result);
-        }
 
         //[Authorize]
-        [HttpPost("add")]
-        public async Task<IActionResult> CreateBankTransaction([FromBody] Transaction transaction)
+        [HttpPost]
+        public async Task<IActionResult> CreateBankTransaction(Transaction transaction)
         {
             if (transaction == null) return BadRequest();
 
             try {
-                var newTransactionItem = await _service.CreateTransactionAsync(transaction);
-
-                if (newTransactionItem == null)
-                    throw new Exception("Failed to add new Transaction");
-
-                return CreatedAtAction(nameof(GetBankTransactions), new { id = newTransactionItem.Id }, newTransactionItem);
+                return Ok(await Mediator.Send(new DataCreate.Command { Transaction = transaction }));
             }
             catch (Exception ex) {
                 _logger.LogError(ex.Message, ex);
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
-
         }
 
         //[Authorize]
-        [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdateBankTransaction([FromBody] Transaction transaction)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateBankTransaction(Guid id, Transaction transaction)
         {
             if (transaction == null) return BadRequest();
 
             try {
-                var updatedItem = await _service.UpdateTransactionAsync(transaction);
-                return Ok(updatedItem);
+                transaction.Id = id;
+                return Ok(await Mediator.Send(new DataEdit.Command { Txn = transaction }));
             }
             catch (Exception ex) {
                 _logger.LogError(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, ex);
             }
         }
-
 
     }
 }

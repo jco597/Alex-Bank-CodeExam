@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using AlexBankExam.Persistence;
 using AlexBankExam.API.Services;
+using AlexBankExam.API.Services.DataTxn;
+using MediatR;
 
 namespace AlexBankExam.API
 {
@@ -31,13 +33,14 @@ namespace AlexBankExam.API
 
             services.AddDbContext<DataContext>(option => { option.UseSqlServer(_config.GetConnectionString("DefaultDbConnection")); });
 
+            services.ConfigureCors(_config);
+
+            services.AddMediatR(typeof(DataList.Handler));
+            services.AddMediatR(typeof(DataFind.Handler));
+            services.AddMediatR(typeof(DataCreate.Handler));
+
             services.AddScoped<IDataAccessService, DataAccessService>();
-
             services.ConfigureAuthenticationJwtBearer(_config);
-
-            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => _config.Bind("JwtSettings", options))
-            //    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => _config.Bind("CookieSettings", options));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,10 +52,8 @@ namespace AlexBankExam.API
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AlexBankExam.API v1"));
             }
 
-            app.UseHttpsRedirection();
-
             app.UseRouting();
-
+            app.UseCors("ApiCORSPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
 
